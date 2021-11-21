@@ -1,4 +1,3 @@
-# The commands in a recipe are passed to a single invocation of the Bash shell.
 SHELL := /bin/bash
 # run all lines of a recipe in a single invocation of the shell rather than each line being invoked separately
 .ONESHELL:
@@ -8,15 +7,13 @@ SHELL := /bin/bash
 ##### Constants #####
 HPCC_DIR := hpcc
 SRC_DIR := src
-BUILD_DIR := build
 HPCC_MAKEFILE := $(HPCC_DIR)/Makefile
-MAKE_INCLUDE := $(BUILD_DIR)/hpl/Make.Linux
 # The build is broken on Ubuntu 20: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=952067
 # I downloaded a patch (version 1.5.0-2.1): https://launchpad.net/ubuntu/+source/hpcc/+index
 # TODO: check if the official site or github repo offers the new fixed sources
-HPCC_LIB := $(BUILD_DIR)/hpl/lib/Linux/libhpl.a
+HPCC_LIB := $(HPCC_DIR)/hpl/lib/Linux/libhpl.a
 USR_LIB := /usr/lib/x86_64-linux-gnu
-INCLUDE_DIRS := $(BUILD_DIR)/include $(BUILD_DIR)/hpl/include $(USR_LIB)/openmpi/include
+INCLUDE_DIRS := $(HPCC_DIR)/include $(HPCC_DIR)/hpl/include $(USR_LIB)/openmpi/include
 INCLUDE_FLAGS := $(addprefix -I,$(INCLUDE_DIRS))
 CFLAGS := -Wall -Werror -pedantic -O3
 DEPS := $(USR_LIB)/libcblas.a $(USR_LIB)/libatlas.a $(USR_LIB)/openmpi/lib/libmpi.so -lm
@@ -35,14 +32,12 @@ all: $(BINARIES)
 $(BINARIES): %: $(SRC_DIR)/%.c $(HPCC_LIB)
 	gcc -o $@ $(CFLAGS) $(INCLUDE_FLAGS) $< $(HPCC_LIB) $(DEPS)
 
-$(HPCC_LIB): $(MAKE_INCLUDE) | openmpi atlas
-	cd $(BUILD_DIR)
-	git apply ../$(SRC_DIR)/fix_mpi_error.patch
+$(HPCC_LIB): $(HPCC_MAKEFILE) | openmpi atlas
+	cp -f $(SRC_DIR)/Make.Linux $(HPCC_DIR)/hpl/Make.Linux
+	cd $(HPCC_DIR)
+	# "git apply" will fail if invoked twice
+	-git apply ../$(SRC_DIR)/fix_mpi_error.patch
 	make -j arch=Linux
-
-$(MAKE_INCLUDE): $(HPCC_MAKEFILE)
-	cp -rf $(HPCC_DIR) $(BUILD_DIR)
-	cp -f $(SRC_DIR)/Make.Linux $@
 
 $(HPCC_MAKEFILE):
 	git submodule update --init --progress
@@ -53,7 +48,12 @@ $(TEST_TARGETS): test-%: %
 	mpirun -np 1 $<
 
 clean:
-	rm -rf $(BUILD_DIR) $(BINARIES)
+	rm -f $(BINARIES)
+	rm -f hpccoutf.txt
+	cd $(HPCC_DIR)
+	# "git apply" will fail if invoked twice
+	-git apply -R ../$(SRC_DIR)/fix_mpi_error.patch
+	make arch=Linux clean
 
 .PHONY: openmpi atlas
 openmpi:

@@ -1,5 +1,3 @@
-/* Adapted from software/hpcc/untarred/src/hpcc.c */
-
 #include <hpcc.h>
 #include <ctype.h>
 

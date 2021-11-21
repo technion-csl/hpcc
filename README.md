@@ -8,5 +8,5 @@ According to its [website](https://icl.utk.edu/hpcc/), the HPC Challenge (HPCC) 
 > 
 > HPCC has not been designed for running invidual tests. Quite the opposite. It's a harness that ties multiple tests together. Having said that, it is possible to comment out calls to individual tests in src/hpcc.c
 
-This is inconvenient, so we use the HPCC library to build multiple executables, one per benchmark.
+This is inconvenient, so we use the HPCC library to build multiple executables, one per benchmark. This repo borrows most of its code from src/hpcc.c in the original HPCC repo.
 
