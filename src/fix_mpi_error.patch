@@ -1,0 +1,42 @@
+Description: Fix FTBFS with recent MPI version, see bug #952067
+Author: Francois Mazen <francois@mzf.fr>
+Forwarded: https://github.com/icl-utk-edu/hpcc/issues/2
+
+--- a/hpl/src/comm/HPL_packL.c
++++ b/hpl/src/comm/HPL_packL.c
+@@ -169,7 +169,7 @@
+          type[nbufs] = MPI_DOUBLE;
+          blen[nbufs] = m1;
+          if( ierr == MPI_SUCCESS )
+-            ierr =   MPI_Address( bufs[nbufs], &disp[nbufs] );
++            ierr =   MPI_Get_address( bufs[nbufs], &disp[nbufs] );
+  
+          nbufs++; len -= m1; j1++; ibuf += m1;
+ /*
+@@ -183,7 +183,7 @@
+             type[nbufs] = MPI_DOUBLE;
+             blen[nbufs] = m1;
+             if( ierr == MPI_SUCCESS )
+-               ierr =   MPI_Address( bufs[nbufs], &disp[nbufs] );
++               ierr =   MPI_Get_address( bufs[nbufs], &disp[nbufs] );
+  
+             nbufs++; len -= m1; j1++; ibuf += m1;
+          }
+@@ -197,7 +197,7 @@
+          type[nbufs] = MPI_DOUBLE;
+          blen[nbufs] = len;
+          if( ierr == MPI_SUCCESS )
+-            ierr =   MPI_Address( bufs[nbufs], &disp[nbufs] );
++            ierr =   MPI_Get_address( bufs[nbufs], &disp[nbufs] );
+          nbufs++;
+       }
+  
+@@ -208,7 +208,7 @@
+  * construct the struct type 
+  */
+       if( ierr == MPI_SUCCESS )
+-         ierr =   MPI_Type_struct( nbufs, blen, disp, type,
++         ierr =   MPI_Type_create_struct( nbufs, blen, disp, type,
+                                    &PANEL->dtypes[IBUF] );
+ /*
+  * release temporaries
