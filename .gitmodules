@@ -1,4 +1,4 @@
-[submodule "hpcc"]
-    path = hpcc
+[submodule "official-hpcc"]
+	path = official-hpcc
     url = https://github.com/icl-utk-edu/hpcc.git
     ignore = dirty

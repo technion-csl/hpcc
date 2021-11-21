@@ -5,7 +5,7 @@ SHELL := /bin/bash
 .POSIX:
 
 ##### Constants #####
-HPCC_DIR := hpcc
+HPCC_DIR := official-hpcc
 SRC_DIR := src
 HPCC_MAKEFILE := $(HPCC_DIR)/Makefile
 # The build is broken on Ubuntu 20: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=952067
