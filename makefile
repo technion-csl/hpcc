@@ -8,6 +8,7 @@ SHELL := /bin/bash
 HPCC_DIR := official-hpcc
 SRC_DIR := src
 HPCC_MAKEFILE := $(HPCC_DIR)/Makefile
+HPCC_MAKEFILE_INCLUDE := $(SRC_DIR)/Make.Linux
 # The build is broken on Ubuntu 20: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=952067
 # I downloaded a patch (version 1.5.0-2.1): https://launchpad.net/ubuntu/+source/hpcc/+index
 # TODO: check if the official site or github repo offers the new fixed sources
@@ -15,10 +16,13 @@ HPCC_LIB := $(HPCC_DIR)/hpl/lib/Linux/libhpl.a
 USR_LIB := /usr/lib/x86_64-linux-gnu
 INCLUDE_DIRS := $(HPCC_DIR)/include $(HPCC_DIR)/hpl/include $(USR_LIB)/openmpi/include
 INCLUDE_FLAGS := $(addprefix -I,$(INCLUDE_DIRS))
-CFLAGS := -Wall -Werror -pedantic -O3
 DEPS := $(USR_LIB)/libcblas.a $(USR_LIB)/libatlas.a $(USR_LIB)/openmpi/lib/libmpi.so -lm
 #FIXME: the input file is fixed to 8GB, so the code can't support other sizes right now
 INPUT_FILE := hpccmemf.txt
+CFLAGS := -Wall -Werror -pedantic -O3
+ifdef DEBUG
+	CFLAGS += -g
+endif
 
 ##### Targets #####
 BINARIES := hpl lat_bw mpi_fft mpi_random_access mpi_random_access_lcg ptrans single_dgemm single_fft single_random_access single_random_access_lcg single_stream star_dgemm star_fft star_random_access star_random_access_lcg star_stream
@@ -32,8 +36,8 @@ all: $(BINARIES)
 $(BINARIES): %: $(SRC_DIR)/%.c $(HPCC_LIB)
 	gcc -o $@ $(CFLAGS) $(INCLUDE_FLAGS) $< $(HPCC_LIB) $(DEPS)
 
-$(HPCC_LIB): $(HPCC_MAKEFILE) | openmpi atlas
-	cp -f $(SRC_DIR)/Make.Linux $(HPCC_DIR)/hpl/Make.Linux
+$(HPCC_LIB): $(HPCC_MAKEFILE) $(HPCC_MAKEFILE_INCLUDE) | openmpi atlas
+	cp -f $(HPCC_MAKEFILE_INCLUDE) $(HPCC_DIR)/hpl/Make.Linux
 	cd $(HPCC_DIR)
 	# "git apply" will fail if invoked twice
 	-git apply ../$(SRC_DIR)/fix_mpi_error.patch
