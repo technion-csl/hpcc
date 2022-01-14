@@ -29,7 +29,7 @@ INCdir       = $(TOPdir)/include
 BINdir       = $(TOPdir)/bin/$(ARCH)
 LIBdir       = $(TOPdir)/lib/$(ARCH)
 #
-HPLlib       = $(LIBdir)/libhpl.a 
+HPLlib       = $(LIBdir)/libhpl.a
 #
 # ----------------------------------------------------------------------
 # - Message Passing library (MPI) --------------------------------------
@@ -38,7 +38,7 @@ HPLlib       = $(LIBdir)/libhpl.a
 # header files,  MPlib  is defined  to be the name of  the library to be
 # used. The variable MPdir is only used for defining MPinc and MPlib.
 #
-MPdir        = /usr/lib/x86_64-linux-gnu/openmpi/
+MPdir        = /usr/lib/x86_64-linux-gnu/openmpi
 MPinc        = -I$(MPdir)/include
 MPlib        = $(MPdir)/lib/libmpi.so
 #
@@ -49,7 +49,7 @@ MPlib        = $(MPdir)/lib/libmpi.so
 # header files,  LAlib  is defined  to be the name of  the library to be
 # used. The variable LAdir is only used for defining LAinc and LAlib.
 #
-LAdir        = /usr/lib/x86_64-linux-gnu/
+LAdir        = /usr/lib/x86_64-linux-gnu
 LAinc        =
 LAlib        = $(LAdir)/libcblas.a $(LAdir)/libatlas.a
 #
@@ -82,9 +82,9 @@ HPL_DEFS     = $(F2CDEFS) $(HPL_OPTS) $(HPL_INCLUDES)
 # - Compilers / linkers - Optimization flags ---------------------------
 # ----------------------------------------------------------------------
 #
-CC           = /usr/bin/gcc
+CC           = /usr/bin/mpicc
 CCNOOPT      = $(HPL_DEFS)
-CCFLAGS      = $(HPL_DEFS) -fomit-frame-pointer -O3 -funroll-loops
+CCFLAGS      = $(CCNOOPT) -fomit-frame-pointer -O3 -funroll-loops
 ifdef DEBUG
     CCFLAGS += -g
 endif
@@ -93,7 +93,7 @@ endif
 # the Fortran internals used in the BLAS library.
 #
 LINKER       = $(CC)
-LINKFLAGS    = $(CCFLAGS)
+LINKFLAGS    =
 #
 ARCHIVER     = ar
 ARFLAGS      = r
