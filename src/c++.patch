@@ -1,0 +1,66 @@
+diff --git a/PTRANS/pdtransdriver.c b/PTRANS/pdtransdriver.c
+index 35dc2c5..4205380 100644
+--- a/PTRANS/pdtransdriver.c
++++ b/PTRANS/pdtransdriver.c
+@@ -17,9 +17,11 @@
+ 
+ /* Common Block Declarations */
+ 
++extern "C" {
+ struct {
+     int ictxt;
+ } context_;
++}
+ 
+ #define context_1 context_
+ 
+diff --git a/STREAM/stream.c b/STREAM/stream.c
+index 87aceed..754cdee 100644
+--- a/STREAM/stream.c
++++ b/STREAM/stream.c
+@@ -175,7 +175,8 @@ static int array_elements;
+ # define HLINE "-------------------------------------------------------------\n"
+ 
+ /* Some compilers require an extra keyword to recognize the "restrict" qualifier. */
+-static double * restrict a, * restrict b, * restrict c;
++/* Idan Yaniv: C++ requires __restrict instead of restrict */
++static double * __restrict a, * __restrict b, * __restrict c;
+ 
+ static double avgtime[4] = {0}, maxtime[4] = {0},
+   mintime[4] = {FLT_MAX,FLT_MAX,FLT_MAX,FLT_MAX};
+diff --git a/hpl/include/hpl_blas.h b/hpl/include/hpl_blas.h
+index b9aee22..bc39d96 100644
+--- a/hpl/include/hpl_blas.h
++++ b/hpl/include/hpl_blas.h
+@@ -102,6 +102,8 @@ enum HPL_SIDE
+  * CBLAS Function prototypes
+  * ---------------------------------------------------------------------
+  */
++
++extern "C" {
+ CBLAS_INDEX       cblas_idamax
+ STDC_ARGS(
+ (  const int,       const double *,  const int ) );
+@@ -154,6 +156,8 @@ STDC_ARGS(
+    const enum CBLAS_DIAG,            const int,       const int,
+    const double,    const double *,  const int,       double *,
+    const int ) );
++}
++
+ /*
+  * ---------------------------------------------------------------------
+  * HPL C BLAS macro definition
+diff --git a/src/io.c b/src/io.c
+index 931838f..e6f210b 100644
+--- a/src/io.c
++++ b/src/io.c
+@@ -404,7 +404,8 @@ HPCC_Finalize(HPCC_Params *params) {
+   fprintf( outputFile, "sizeof_double=%d\n", (int)sizeof(double) );
+   fprintf( outputFile, "sizeof_s64Int=%d\n", (int)sizeof(s64Int) );
+   fprintf( outputFile, "sizeof_u64Int=%d\n", (int)sizeof(u64Int) );
+-  fprintf( outputFile, "sizeof_struct_double_double=%d\n", (int)sizeof(struct{double HPCC_r,HPCC_i;}) );
++  struct struct_double_double{double HPCC_r,HPCC_i;};
++  fprintf( outputFile, "sizeof_struct_double_double=%d\n", (int)sizeof(struct_double_double) );
+   fprintf( outputFile, "CommWorldProcs=%d\n", commSize );
+   fprintf( outputFile, "MPI_Wtick=%e\n", MPI_Wtick() );
+   fprintf( outputFile, "HPL_Tflops=%g\n", params->HPLrdata.Gflops * 1e-3 );

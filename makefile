@@ -34,13 +34,14 @@ TEST_TARGETS := $(addprefix test-,$(BINARIES))
 all: $(BINARIES)
 
 $(BINARIES): %: $(SRC_DIR)/%.c $(HPCC_LIB)
-	gcc -o $@ $(CFLAGS) $(INCLUDE_FLAGS) $< $(HPCC_LIB) $(DEPS)
+	mpic++ -o $@ $(CFLAGS) $(INCLUDE_FLAGS) $< $(HPCC_LIB) $(DEPS)
 
 $(HPCC_LIB): $(HPCC_MAKEFILE) $(HPCC_MAKEFILE_INCLUDE) | openmpi atlas
 	cp -f $(HPCC_MAKEFILE_INCLUDE) $(HPCC_DIR)/hpl/Make.Linux
 	cd $(HPCC_DIR)
 	# "git apply" will fail if invoked twice
 	-git apply ../$(SRC_DIR)/fix_mpi_error.patch
+	-git apply ../$(SRC_DIR)/c++.patch
 	make -j arch=Linux
 
 $(HPCC_MAKEFILE):
@@ -57,6 +58,7 @@ clean:
 	cd $(HPCC_DIR)
 	# "git apply" will fail if invoked twice
 	-git apply -R ../$(SRC_DIR)/fix_mpi_error.patch
+	-git apply -R ../$(SRC_DIR)/c++.patch
 	make arch=Linux clean
 
 .PHONY: openmpi atlas
