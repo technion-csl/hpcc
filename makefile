@@ -5,19 +5,19 @@ SHELL := /bin/bash
 .POSIX:
 
 ##### Constants #####
-HPCC_DIR := official-hpcc
-SRC_DIR := src
-HPCC_MAKEFILE := $(HPCC_DIR)/Makefile
-HPCC_MAKEFILE_INCLUDE := $(SRC_DIR)/Make.Linux
+
+ROOT_DIR := $(PWD)
+HPCC_DIR := $(ROOT_DIR)/official-hpcc
+SRC_DIR := $(ROOT_DIR)/src
 # The build is broken on Ubuntu 20: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=952067
 # I downloaded a patch (version 1.5.0-2.1): https://launchpad.net/ubuntu/+source/hpcc/+index
 # TODO: check if the official site or github repo offers the new fixed sources
-HPCC_LIB := $(HPCC_DIR)/hpl/lib/Linux/libhpl.a
+PATCH := $(SRC_DIR)/fix_mpi_error.patch
 USR_LIB := /usr/lib/x86_64-linux-gnu
 INCLUDE_DIRS := $(HPCC_DIR)/include $(HPCC_DIR)/hpl/include $(USR_LIB)/openmpi/include
 INCLUDE_FLAGS := $(addprefix -I,$(INCLUDE_DIRS))
 DEPS := $(USR_LIB)/libcblas.a $(USR_LIB)/libatlas.a $(USR_LIB)/openmpi/lib/libmpi.so -lm
-#FIXME: the input file is fixed to 8GB, so the code can't support other sizes right now
+#FIXME: the input file is fixed to 1GB currently
 INPUT_FILE := hpccmemf.txt
 CFLAGS := -Wall -Werror -pedantic -O3
 ifdef DEBUG
@@ -25,23 +25,32 @@ ifdef DEBUG
 endif
 
 ##### Targets #####
+
+HPCC_MAKEFILE := $(HPCC_DIR)/Makefile
+HPCC_MAKEFILE_INCLUDE := $(SRC_DIR)/Make.Linux
+PATCH_WAS_APPLIED := $(ROOT_DIR)/patch_was_applied.txt
+HPCC_LIB := $(HPCC_DIR)/hpl/lib/Linux/libhpl.a
 BINARIES := hpl lat_bw mpi_fft mpi_random_access mpi_random_access_lcg ptrans single_dgemm single_fft single_random_access single_random_access_lcg single_stream star_dgemm star_fft star_random_access star_random_access_lcg star_stream
 TEST_TARGETS := $(addprefix test-,$(BINARIES))
 
 ##### Recipes #####
-.PHONY: all test clean
+.PHONY: all test clean unpatch
 
 all: $(BINARIES)
 
 $(BINARIES): %: $(SRC_DIR)/%.c $(HPCC_LIB)
 	gcc -o $@ $(CFLAGS) $(INCLUDE_FLAGS) $< $(HPCC_LIB) $(DEPS)
 
-$(HPCC_LIB): $(HPCC_MAKEFILE) $(HPCC_MAKEFILE_INCLUDE) | openmpi atlas
+$(HPCC_LIB): $(PATCH_WAS_APPLIED) $(HPCC_MAKEFILE_INCLUDE) | openmpi atlas
 	cp -f $(HPCC_MAKEFILE_INCLUDE) $(HPCC_DIR)/hpl/Make.Linux
 	cd $(HPCC_DIR)
-	# "git apply" will fail if invoked twice
-	-git apply ../$(SRC_DIR)/fix_mpi_error.patch
 	make -j arch=Linux
+
+$(PATCH_WAS_APPLIED): $(HPCC_MAKEFILE)
+	cd $(HPCC_DIR)
+	git apply $(PATCH)
+	# "git apply" will fail if invoked twice, so we use a flag
+	touch $@
 
 $(HPCC_MAKEFILE):
 	git submodule update --init --progress
@@ -55,9 +64,12 @@ clean:
 	rm -f $(BINARIES)
 	rm -f hpccoutf.txt
 	cd $(HPCC_DIR)
-	# "git apply" will fail if invoked twice
-	-git apply -R ../$(SRC_DIR)/fix_mpi_error.patch
 	make arch=Linux clean
+
+unpatch:
+	# the following command will fail if invoked twice
+	git apply -R $(PATCH)
+	rm -f $(PATCH_WAS_APPLIED)
 
 .PHONY: openmpi atlas
 openmpi:
