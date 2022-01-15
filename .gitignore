@@ -1,7 +1,8 @@
 # Output files
 hpccoutf.txt
+patch_was_applied.txt
 
-# Targets
+# Binaries
 hpl
 lat_bw
 mpi_fft
