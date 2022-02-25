@@ -73,10 +73,10 @@ unpatch:
 
 .PHONY: openmpi atlas
 openmpi:
-	sudo apt install -y libopenmpi-dev
+	dpkg-query -s libopenmpi-dev > /dev/null 2>&1 || sudo apt install -y libopenmpi-dev
 
 atlas:
-	sudo apt install -y libatlas-base-dev
+	dpkg-query -s libatlas-base-dev > /dev/null 2>&1 || sudo apt install -y libatlas-base-dev
 
 # empty recipe to prevent make from remaking the makefile:
 # https://www.gnu.org/software/make/manual/html_node/Remaking-Makefiles.html
