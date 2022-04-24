@@ -40,7 +40,7 @@ all: $(BINARIES)
 $(BINARIES): %: $(SRC_DIR)/%.c $(HPCC_LIB)
 	gcc -o $@ $(CFLAGS) $(INCLUDE_FLAGS) $< $(HPCC_LIB) $(DEPS)
 
-$(HPCC_LIB): $(PATCH_WAS_APPLIED) $(HPCC_MAKEFILE_INCLUDE) | openmpi atlas
+$(HPCC_LIB): $(PATCH_WAS_APPLIED) $(HPCC_MAKEFILE_INCLUDE)
 	cp -f $(HPCC_MAKEFILE_INCLUDE) $(OFFICIAL_HPCC)/hpl/Make.Linux
 	cd $(OFFICIAL_HPCC)
 	make -j arch=Linux
