@@ -31,7 +31,7 @@ HPCC_MAKEFILE_INCLUDE := $(SRC_DIR)/Make.Linux
 PATCH_WAS_APPLIED := $(ROOT_DIR)/patch_was_applied.txt
 HPCC_LIB := $(OFFICIAL_HPCC)/hpl/lib/Linux/libhpl.a
 BINARIES := hpl lat_bw mpi_fft mpi_random_access mpi_random_access_lcg ptrans single_dgemm single_fft single_random_access single_random_access_lcg single_stream star_dgemm star_fft star_random_access star_random_access_lcg star_stream
-TEST_TARGETS := $(addprefix test-,$(BINARIES))
+RUN_TARGETS := $(addprefix run-,$(BINARIES))
 
 ##### Recipes #####
 .PHONY: all test clean unpatch
@@ -55,9 +55,9 @@ $(PATCH_WAS_APPLIED): $(HPCC_MAKEFILE)
 $(HPCC_MAKEFILE):
 	git submodule update --init --progress $(OFFICIAL_HPCC)
 
-test: $(TEST_TARGETS)
+test: $(RUN_TARGETS)
 
-$(TEST_TARGETS): test-%: %
+$(RUN_TARGETS): run-%: %
 	mpirun -np 1 $<
 
 clean:

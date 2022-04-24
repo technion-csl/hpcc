@@ -1,7 +1,12 @@
 # TL;DR
 This repo slices the official HPCC code into its composing benchmarks such that they can be run individually.
 
-# In more detail...
+# How to build and run
+Simply invoke `make` to build the standalone binaries (hpl, lat\_bw, mpi\_fft, etc.) in the top-level directory.
+To build a single binary, you can `make <binary_name>`.
+To run a single binary, you can `make run-<binary_name>`.
+
+# Motivation
 According to its [website](https://icl.utk.edu/hpcc/), the HPC Challenge (HPCC) suite measures a range memory access patterns and consists of seven benchmarks: HPL, DGEMM, STREAM, PTRANS, RandomAccess, FFT, and Communication bandwidth and latency. Strangely, the suite links all these benchmarks into a single, monolithic executable that runs them one by one: see [this question](https://icl.utk.edu/hpcc/faq/index.html#323) from the HPCC FAQ:
 
 > How do I run individual tests in HPCC?
