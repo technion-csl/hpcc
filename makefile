@@ -17,7 +17,6 @@ USR_LIB := /usr/lib/x86_64-linux-gnu
 INCLUDE_DIRS := $(OFFICIAL_HPCC)/include $(OFFICIAL_HPCC)/hpl/include $(USR_LIB)/openmpi/include
 INCLUDE_FLAGS := $(addprefix -I,$(INCLUDE_DIRS))
 DEPS := $(USR_LIB)/libcblas.a $(USR_LIB)/libatlas.a $(USR_LIB)/openmpi/lib/libmpi.so -lm
-#FIXME: the input file is fixed to 1GB currently
 INPUT_FILE := hpccmemf.txt
 CFLAGS := -Wall -Werror -pedantic -O3
 ifdef DEBUG
@@ -70,13 +69,6 @@ unpatch:
 	# the following command will fail if invoked twice
 	git apply -R $(PATCH)
 	rm -f $(PATCH_WAS_APPLIED)
-
-.PHONY: openmpi atlas
-openmpi:
-	dpkg-query -s libopenmpi-dev > /dev/null 2>&1 || sudo apt install -y libopenmpi-dev
-
-atlas:
-	dpkg-query -s libatlas-base-dev > /dev/null 2>&1 || sudo apt install -y libatlas-base-dev
 
 # empty recipe to prevent make from remaking the makefile:
 # https://www.gnu.org/software/make/manual/html_node/Remaking-Makefiles.html

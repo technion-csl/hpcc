@@ -4,7 +4,14 @@ This repo slices the official HPCC code into its composing benchmarks such that 
 # How to build and run
 Simply invoke `make` to build the standalone binaries (hpl, lat\_bw, mpi\_fft, etc.) in the top-level directory.
 To build a single binary, you can `make <binary_name>`.
-To run a single binary, you can `make run-<binary_name>`.
+
+To run a single binary, you can `make run-<binary_name>`. Please note that the input size is set to 1GB in the `hpccmemf.txt` file.
+
+# Prerequisites
+HPCC requires Open MPI and ATLAS (Automatically Tuned Linear Algebra Software). On Ubuntu, you may install them via:
+```
+$ sudo apt install libopenmpi-dev libatlas-base-dev
+```
 
 # Motivation
 According to its [website](https://icl.utk.edu/hpcc/), the HPC Challenge (HPCC) suite measures a range memory access patterns and consists of seven benchmarks: HPL, DGEMM, STREAM, PTRANS, RandomAccess, FFT, and Communication bandwidth and latency. Strangely, the suite links all these benchmarks into a single, monolithic executable that runs them one by one: see [this question](https://icl.utk.edu/hpcc/faq/index.html#323) from the HPCC FAQ:
